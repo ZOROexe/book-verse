@@ -23,8 +23,8 @@ export const placeOrder = async (req, res) => {
 
 export const orderHistory = async (req, res) => {
   try {
-    const { id } = req.headers;
-    const userData = await User.findById(id).populate({
+    const { userId } = req.user;
+    const userData = await User.findById(userId).populate({
       path: "orders",
       populate: { path: "books" },
     });

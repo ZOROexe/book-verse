@@ -31,7 +31,7 @@ const Cart = () => {
     if (Cart && Cart.length > 0) {
       let total = 0;
       Cart.map((items) => {
-        total += items.price;
+        total += Number(items.price);
       });
       setTotal(total);
       total = 0;

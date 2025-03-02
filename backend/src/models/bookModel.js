@@ -11,7 +11,7 @@ const bookSchema = new mongoose.Schema(
       required: true,
     },
     price: {
-      type: String,
+      type: Number,
       required: true,
     },
     url: {
@@ -20,11 +20,15 @@ const bookSchema = new mongoose.Schema(
     },
     desc: {
       type: String,
+      /* required: true, */
+    },
+    ISBN: {
+      type: String,
       required: true,
     },
     language: {
       type: String,
-      required: true,
+      /* required: true, */
     },
   },
   { timestamps: true }

@@ -1,3 +1,4 @@
+import { query } from "express";
 import Books from "../models/bookModel.js";
 
 export const newBook = async (req, res) => {
@@ -55,12 +56,34 @@ export const deleteBook = async (req, res) => {
   }
 };
 
-export const getAllBooks = async (req, res) => {
+/* export const getAllBooks = async (req, res) => {
   try {
     const books = await Books.find().sort({ createdAt: -1 });
     return res.status(200).json({ books });
   } catch (error) {
     console.log("Error in getting info of all books", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+}; */
+
+export const getAllBooks = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1; // Default page = 1
+    const limit = parseInt(req.query.limit) || 10; // Default limit = 10
+    const skip = (page - 1) * limit;
+
+    const books = await Books.find()
+      .sort({ createdAt: -1 }) // Sort by latest books
+      .skip(skip)
+      .limit(limit);
+
+    // Check if there are more books to load
+    const totalBooks = await Books.countDocuments();
+    const hasMore = skip + limit < totalBooks;
+
+    return res.status(200).json({ books, hasMore });
+  } catch (error) {
+    console.error("Error in getting info of all books", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -83,6 +106,21 @@ export const getSingleBook = async (req, res) => {
     return res.status(200).json({ book });
   } catch (error) {
     console.log("Error in finding book", error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const Search = async (req, res) => {
+  try {
+    const query = req.query.q;
+    if (!query) return res.json({ books: [] });
+
+    const books = await Books.find({
+      title: { $regex: query, $options: "i" },
+    }).limit(10);
+
+    return res.json({ books });
+  } catch (error) {
     return res.status(500).json({ message: "Internal server error" });
   }
 };

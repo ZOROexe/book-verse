@@ -15,6 +15,7 @@ const OrderHistory = () => {
       });
 
       setOrderHist(res.data.ordersData);
+      console.log(res);
     };
     fetch();
   }, []);

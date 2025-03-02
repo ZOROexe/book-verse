@@ -9,6 +9,7 @@ import {
   getAllBooks,
   getRecentBooks,
   getSingleBook,
+  Search,
 } from "../controllers/books.controller.js";
 import { authentication } from "../lib/auth.js";
 
@@ -21,5 +22,6 @@ router.put("/update-address", authentication, updateAddress);
 router.get("/get-all-books", getAllBooks);
 router.get("/get-recent-books", getRecentBooks);
 router.get("/get-book/:id", getSingleBook);
+router.get("/search", Search);
 
 export default router;
