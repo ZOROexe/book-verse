@@ -44,7 +44,7 @@ const Cart = () => {
         {},
         { headers }
       );
-      alert(response.data.message);
+      toast.success(response.data.message);
     } catch (error) {
       console.log(error);
     }
@@ -57,7 +57,7 @@ const Cart = () => {
         { order: Cart },
         { headers }
       );
-      alert(response.data.message);
+      toast.success("Order Placed Suceesfully");
       navigate("/profile/orderHistory");
     } catch (error) {
       console.log(error);

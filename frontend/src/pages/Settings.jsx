@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Loader from "../components/Loader";
 import { axiosInstance } from "../lib/axiosConfig.js";
+import toast from "react-hot-toast";
 const Settings = () => {
   const [ProfileData, setProfileData] = useState();
   const [Value, setValue] = useState({ address: "" });
@@ -33,7 +34,7 @@ const Settings = () => {
         headers,
       }
     );
-    alert(res.data.message);
+    toast.success(res.data.message);
   };
   return (
     <>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { axiosInstance } from "../lib/axiosConfig.js";
+import toast, { Toaster } from "react-hot-toast";
 
 const Signup = () => {
   const history = useNavigate();
@@ -28,18 +29,18 @@ const Signup = () => {
         Data.password === "" ||
         Data.address === ""
       ) {
-        alert("All fields are required");
+        toast.error("All fields are required");
       } else {
         const response = await axiosInstance.post(
           "http://localhost:3001/api/user/signup",
           Data
         );
         setData({ username: "", email: "", password: "", address: "" });
-        alert(response.data.message);
+        toast.success(response.data.message);
         history("/login");
       }
     } catch (error) {
-      alert(error.response.data.message);
+      toast.error(error.response.data.message);
     }
   };
   return (

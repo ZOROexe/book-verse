@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { axiosInstance } from "../lib/axiosConfig.js";
 import { authActions } from "../store/auth.js";
+import toast from "react-hot-toast";
 
 const Login = () => {
   const [Data, setData] = useState({ username: "", password: "" });
@@ -21,23 +22,24 @@ const Login = () => {
     e.preventDefault();
     try {
       if (Data.email === "" || Data.password === "") {
-        alert("All fields are required");
+        toast.error("All fields are required");
       } else {
         const response = await axiosInstance.post(
           "http://localhost:3001/api/user/login",
           Data
         );
         console.log(response);
+        toast.success("Login Successfull");
         setData({ email: "", password: "" });
         dispatch(authActions.login());
-        history("/profile");
+        /* history("/profile"); */
         dispatch(authActions.changeRole(response.data.user.role));
         localStorage.setItem("id", response.data.user._id);
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("role", response.data.user.role);
       }
     } catch (error) {
-      alert(error);
+      toast.error(error.response.data.message);
     }
   };
   return (

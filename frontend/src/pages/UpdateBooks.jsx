@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../lib/axiosConfig.js";
 import { useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 const UpdateBooks = () => {
   const { id } = useParams();
   const history = useNavigate();
@@ -49,18 +50,18 @@ const UpdateBooks = () => {
         Data.desc === "" ||
         Data.language === ""
       ) {
-        alert("All fields are required");
+        toast.error("All fields are required");
       } else {
         const response = await axiosInstance.put(
           `http://localhost:3001/api/admin/update-book/${id}`,
           Data,
           { headers }
         );
-        alert(response.data.message);
+        toast.success(response.data.message);
         history(`/get-book/${id}`);
       }
     } catch (error) {
-      alert(error.response.data.message);
+      toast.error(error.response.data.message);
     }
   };
 

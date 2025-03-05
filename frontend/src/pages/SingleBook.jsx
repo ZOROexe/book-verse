@@ -8,6 +8,7 @@ import { GoHeartFill } from "react-icons/go";
 import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { GrLanguage } from "react-icons/gr";
+import toast from "react-hot-toast";
 
 const SingleBook = () => {
   const { id } = useParams();
@@ -40,7 +41,7 @@ const SingleBook = () => {
         {},
         { headers }
       );
-      alert(response.data.message);
+      toast.success(response.data.message);
     } catch (error) {
       console.log(error);
     }
@@ -52,9 +53,9 @@ const SingleBook = () => {
         {},
         { headers }
       );
-      alert(response.data.message);
+      toast.success(response.data.message);
     } catch (error) {
-      alert(error.response.data.message);
+      toast.error(error.response.data.message);
       console.log(error);
     }
   };
@@ -64,7 +65,7 @@ const SingleBook = () => {
         `http://localhost:3001/api/admin/delete-book/${id}`,
         { headers }
       );
-      alert(response.data.message);
+      toast.success(response.data.message);
       history("/all-books");
     } catch (error) {
       console.log(error);

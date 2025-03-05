@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { IoOpenOutline } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa6";
 import SeeUserData from "./SeeUserData";
+import toast from "react-hot-toast";
 const AllOrders = () => {
   const [OrderHistory, setOrderHistory] = useState();
   const [userDiv, setuserDiv] = useState("hidden");
@@ -39,7 +40,7 @@ const AllOrders = () => {
       Values,
       { headers }
     );
-    alert(response.data.message);
+    toast.success(response.data.message);
   };
 
   return (

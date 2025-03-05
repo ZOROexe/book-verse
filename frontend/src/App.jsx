@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -22,6 +23,7 @@ import { authActions } from "./store/auth";
 const App = () => {
   const dispatch = useDispatch();
   const role = useSelector((state) => state.auth.role);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   useEffect(() => {
     if (
       localStorage.getItem("id") &&
@@ -36,12 +38,22 @@ const App = () => {
     <div className="">
       <Navbar />
       <Routes>
-        <Route exact path="/" element={<Home />} />
+        <Route
+          exact
+          path="/"
+          element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
+        />
         <Route path="/all-books" element={<AllBooks />} />
         <Route path="/get-book/:id" element={<SingleBook />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/login"
+          element={isLoggedIn ? <Navigate to="/" /> : <Login />}
+        />
+        <Route
+          path="/signup"
+          element={isLoggedIn ? <Navigate to="/" /> : <Signup />}
+        />
         <Route path="/profile" element={<Profile />}>
           {role !== "admin" ? (
             <Route index element={<Favourite />} />
@@ -58,6 +70,7 @@ const App = () => {
           <Route path="/update-book/:id" element={<UpdateBooks />} />
         )}
       </Routes>
+      <Toaster />
       <Footer />
     </div>
   );

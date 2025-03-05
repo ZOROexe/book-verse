@@ -9,7 +9,7 @@ const Recommend = () => {
     id: localStorage.getItem("id"),
     authorization: `Bearer ${localStorage.getItem("token")}`,
   };
-  useEffect(() => {
+  /* useEffect(() => {
     const fetch = async () => {
       const res = await axiosInstance.get("http://localhost:3001/api/order/", {
         headers,
@@ -24,6 +24,52 @@ const Recommend = () => {
         setBooks(response.data.recommendations);
       }
     };
+    fetch();
+  }, []); */
+
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        // Fetch user orders
+        const orderRes = await axiosInstance.get(
+          "http://localhost:3001/api/order/",
+          { headers }
+        );
+        const latestOrder = orderRes.data.ordersData?.[0]?.books?.title;
+
+        // Fetch user favorites
+        const favRes = await axiosInstance.get(
+          "http://localhost:3001/api/favourites/",
+          { headers }
+        );
+        const favoriteBook = favRes.data.favBooks?.[0]?.title;
+        console.log(favoriteBook);
+
+        // Fetch user cart
+        const cartRes = await axiosInstance.get(
+          "http://localhost:3001/api/cart/",
+          { headers }
+        );
+        const cartBook = cartRes.data.cart?.[0]?.title;
+        console.log(cartBook);
+
+        // Determine which book to use for recommendation
+        const recommendTitle = latestOrder || favoriteBook || cartBook;
+        console.log(recommendTitle);
+
+        if (recommendTitle) {
+          const response = await axios.get("http://localhost:5001/recommend", {
+            params: { title: recommendTitle },
+          });
+
+          setBooks(response.data.recommendations);
+          console.log(Books);
+        }
+      } catch (error) {
+        console.error("Error fetching recommendations:", error);
+      }
+    };
+
     fetch();
   }, []);
 
