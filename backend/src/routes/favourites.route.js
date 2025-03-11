@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.put("/add/:id", authentication, addFav);
-router.delete("/remove/:id", authentication, removeFav);
+router.put("/remove/:id", authentication, removeFav);
 router.get("/", authentication, getFavs);
 
 export default router;

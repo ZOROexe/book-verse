@@ -1,5 +1,6 @@
 import { query } from "express";
 import Books from "../models/bookModel.js";
+import Ratings from "../models/ratingModel.js";
 
 export const newBook = async (req, res) => {
   try {
@@ -103,7 +104,21 @@ export const getSingleBook = async (req, res) => {
     const { id } = req.params;
     const book = await Books.findById(id);
     if (!book) return res.status(404).json({ message: "Book not found" });
-    return res.status(200).json({ book });
+    const { ISBN } = book;
+    const ratings = await Ratings.aggregate([
+      { $match: { ISBN } },
+      {
+        $group: {
+          _id: "$ISBN",
+          avgRating: { $avg: "$rating" },
+          totalRatings: { $sum: 1 },
+        },
+      },
+    ]);
+    const avgRating =
+      ratings.length > 0 ? ratings[0].avgRating.toFixed(1) : "No ratings yet";
+    const totalRatings = ratings.length > 0 ? ratings[0].totalRatings : 0;
+    return res.status(200).json({ book, avgRating, totalRatings });
   } catch (error) {
     console.log("Error in finding book", error);
     return res.status(500).json({ message: "Internal server error" });
@@ -121,6 +136,36 @@ export const Search = async (req, res) => {
 
     return res.json({ books });
   } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const rateBook = async (req, res) => {
+  const { rating } = req.body;
+  const { ISBN } = req.query;
+  const { userId } = req.user;
+  const ratingOutOf10 = rating * 2;
+
+  try {
+    if (req.method === "GET") {
+      const userRating = await Ratings.findOne({ ISBN, userID: userId });
+      return res
+        .status(200)
+        .json({ rating: userRating ? userRating.rating : 0 });
+    }
+
+    const book = await Books.findOne({ ISBN });
+    if (!book) return res.status(404).json({ message: "Book not found" });
+    const existingRating = await Ratings.findOne({ ISBN, userID: userId });
+    if (existingRating) {
+      existingRating.rating = ratingOutOf10;
+      await existingRating.save();
+    } else {
+      await Ratings.create({ ISBN, userID: userId, rating: ratingOutOf10 });
+    }
+    return res.status(200).json({ message: "Rating submitted successfully" });
+  } catch (error) {
+    console.log("Error in rating book", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };

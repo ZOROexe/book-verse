@@ -9,12 +9,42 @@ import { FaRegEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { GrLanguage } from "react-icons/gr";
 import toast from "react-hot-toast";
+import Rating from "@mui/material/Rating";
 
 const SingleBook = () => {
   const { id } = useParams();
   const [Book, setBook] = useState();
+  const [Ratings, setRatings] = useState();
+  const [userRating, setUserRating] = useState(0);
+  const [Total, setTotal] = useState();
   const role = useSelector((state) => state.auth.role);
   const history = useNavigate();
+  const headers = {
+    bookId: id,
+    userId: localStorage.getItem("id"),
+    authorization: `Bearer ${localStorage.getItem("token")}`,
+  };
+
+  const submitRating = async () => {
+    try {
+      const res = await axiosInstance.put(
+        `http://localhost:3001/api/user/rateBook`,
+        {
+          rating: userRating,
+        },
+        {
+          params: {
+            ISBN: Book.ISBN,
+          },
+          headers,
+        }
+      );
+      toast.success("Rating Submitted");
+    } catch (error) {
+      console.log("Error in submitting rating", error);
+      toast.error(error);
+    }
+  };
   useEffect(() => {
     window.scrollTo(0, 0);
     const fetch = async () => {
@@ -22,18 +52,27 @@ const SingleBook = () => {
         const res = await axiosInstance.get(
           `http://localhost:3001/api/user/get-book/${id}`
         );
+        const ratingRes = await axiosInstance.get(
+          `http://localhost:3001/api/user/rateBook`,
+          {
+            params: {
+              ISBN: res.data.book.ISBN,
+            },
+            headers,
+          }
+        );
+        console.log(ratingRes);
+        setUserRating((ratingRes.data.rating / 2).toFixed(1));
         setBook(res.data.book);
+        setRatings((res.data.avgRating / 2).toFixed(1));
+        setTotal(res.data.totalRatings);
+        console.log(res);
       } catch (error) {
         console.log("Error in fetching book", error);
       }
     };
     fetch();
   }, []);
-  const headers = {
-    bookId: id,
-    userId: localStorage.getItem("id"),
-    authorization: `Bearer ${localStorage.getItem("token")}`,
-  };
   const addToFavourite = async () => {
     try {
       const response = await axiosInstance.put(
@@ -135,6 +174,42 @@ const SingleBook = () => {
             <p className="mt-4 text-zinc-100 text-3xl font-semibold">
               Price : ₹ {Book.price}{" "}
             </p>
+            <div className="mt-5 w-full">
+              <p className="text-zinc-100 text-2xl font-semibold pb-2">
+                Rating
+              </p>
+              <div className="flex flex-row gap-5 items-center">
+                <Rating
+                  name="read-only"
+                  value={Ratings}
+                  className="scale-125 ml-3"
+                  readOnly
+                />
+                <p className="text-zinc-100">
+                  {Ratings} out of 5 ({Total})
+                </p>
+              </div>
+            </div>
+            <div className="mt-8 flex flex-col gap-2">
+              <p className=" text-zinc-100 text-3xl font-semibold">
+                Your Rating
+              </p>
+              <Rating
+                name="simple-controlled"
+                value={userRating}
+                className="scale-125 ml-3"
+                onChange={(event, newRating) => {
+                  setUserRating(newRating);
+                }}
+              />
+              <p className="text-zinc-100">{userRating} out of 5</p>
+              <button
+                className="mt-4 px-3 w-1/2 bg-blue-500 text-white font-semibold py-2 rounded hover:bg-blue-600 transition-all duration-300"
+                onClick={submitRating}
+              >
+                Submit
+              </button>
+            </div>
           </div>
         </div>
       )}

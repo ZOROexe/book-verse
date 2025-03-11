@@ -23,7 +23,9 @@ export const addFav = async (req, res) => {
 
 export const removeFav = async (req, res) => {
   const { userId } = req.user;
-  const { bookId } = req.body;
+  const { id } = req.params;
+  console.log(userId);
+  const bookId = id;
   try {
     const user = await User.findById(userId);
     const alreadyFavBook = user.favourites.includes(bookId);

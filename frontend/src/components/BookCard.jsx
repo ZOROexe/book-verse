@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { axiosInstance } from "../lib/axiosConfig.js";
+import toast from "react-hot-toast";
 const BookCard = ({ image, title, author, price, bookid, fav }) => {
   const headers = {
     bookid: bookid,
